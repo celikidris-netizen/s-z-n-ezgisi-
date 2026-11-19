@@ -1,0 +1,1460 @@
+
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sözün Ezgisi | 10. Sınıf TDE Etkileşimli Oyun</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Orbitron & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
+    <!-- Tone.js (Ses efektleri için) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ea;
+            --neon-purple: #9d00ff;
+            --neon-red: #ff2a55;
+            --neon-green: #00ff88;
+            --bg-dark: #070514;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .font-cyber {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* =========================================
+           1. YUKARI DOĞRU AKAN NEON IZGARA (GRID)
+           ========================================= */
+        .cyber-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background: radial-gradient(circle at 50% 25%, #1d0c42 0%, #0b061f 55%, #04020a 100%);
+            overflow: hidden;
+        }
+
+        .cyber-grid-wrapper {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            perspective: 450px;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .cyber-grid {
+            position: absolute;
+            width: 240%;
+            height: 240%;
+            left: -70%;
+            top: -40%;
+            background-image: 
+                linear-gradient(to right, rgba(0, 243, 255, 0.22) 1px, transparent 1px),
+                linear-gradient(to top, rgba(255, 0, 234, 0.28) 1px, transparent 1px);
+            background-size: 60px 60px;
+            transform: rotateX(58deg);
+            animation: gridMoveUp 2.2s linear infinite;
+            mask-image: linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 88%);
+            -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 88%);
+        }
+
+        /* Yukarı doğru akan ızgara animasyonu */
+        @keyframes gridMoveUp {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 0 -60px;
+            }
+        }
+
+        /* =========================================
+           2. GLASSMORPHISM & NEON ÇERÇEVELER
+           ========================================= */
+        .glass-panel {
+            background: rgba(16, 12, 42, 0.62);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1.5px solid rgba(0, 243, 255, 0.45);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.65),
+                inset 0 0 18px rgba(0, 243, 255, 0.12),
+                0 0 16px rgba(255, 0, 234, 0.25);
+            border-radius: 1.25rem;
+        }
+
+        .glass-panel-pink {
+            background: rgba(24, 10, 46, 0.68);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1.5px solid rgba(255, 0, 234, 0.55);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.65),
+                inset 0 0 18px rgba(255, 0, 234, 0.15),
+                0 0 18px rgba(0, 243, 255, 0.22);
+            border-radius: 1.25rem;
+        }
+
+        .neon-text-blue {
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.8), 0 0 20px rgba(0, 243, 255, 0.45);
+        }
+
+        .neon-text-pink {
+            text-shadow: 0 0 8px rgba(255, 0, 234, 0.85), 0 0 20px rgba(255, 0, 234, 0.45);
+        }
+
+        /* Neon Butonlar */
+        .btn-neon-primary {
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.2), rgba(255, 0, 234, 0.25));
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4), inset 0 0 10px rgba(0, 243, 255, 0.2);
+            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .btn-neon-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.38), rgba(255, 0, 234, 0.42));
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 25px rgba(255, 0, 234, 0.7), 0 0 12px rgba(0, 243, 255, 0.6);
+            transform: translateY(-2px) scale(1.01);
+        }
+
+        .btn-neon-primary:active:not(:disabled) {
+            transform: translateY(1px) scale(0.99);
+        }
+
+        .btn-neon-hint {
+            background: rgba(255, 0, 234, 0.16);
+            border: 2px solid var(--neon-pink);
+            box-shadow: 0 0 14px rgba(255, 0, 234, 0.35);
+            transition: all 0.25s ease;
+        }
+
+        .btn-neon-hint:hover:not(:disabled) {
+            background: rgba(255, 0, 234, 0.32);
+            box-shadow: 0 0 22px rgba(255, 0, 234, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .btn-neon-hint:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            border-color: #64748b;
+            box-shadow: none;
+            filter: grayscale(0.8);
+        }
+
+        /* =========================================
+           3. AÇILIŞ EKRANI HAREKETLİ NEON SİMGE
+           ========================================= */
+        .loader-ring {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
+
+        .loader-ring::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            border-top-color: var(--neon-blue);
+            border-right-color: var(--neon-pink);
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.6);
+            animation: spin 1.2s linear infinite;
+        }
+
+        .loader-ring::after {
+            content: "";
+            position: absolute;
+            inset: 12px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-bottom-color: var(--neon-pink);
+            border-left-color: var(--neon-blue);
+            animation: spinReverse 1.8s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes spinReverse {
+            100% { transform: rotate(-360deg); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 12px rgba(0, 243, 255, 0.7)); }
+            50% { transform: scale(1.08); filter: drop-shadow(0 0 26px rgba(255, 0, 234, 0.9)); }
+        }
+
+        /* =========================================
+           4. SARSILMA VE KIRMIZI PARLAMA EFEKTİ
+           ========================================= */
+        @keyframes screenShake {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            15% { transform: translate(-10px, -6px) rotate(-1deg); }
+            30% { transform: translate(10px, 5px) rotate(1deg); }
+            45% { transform: translate(-8px, 6px) rotate(-0.8deg); }
+            60% { transform: translate(8px, -5px) rotate(0.8deg); }
+            75% { transform: translate(-5px, 3px) rotate(-0.4deg); }
+            90% { transform: translate(5px, -2px) rotate(0.4deg); }
+        }
+
+        .shake-error {
+            animation: screenShake 0.48s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        .red-flash-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 50;
+            background: radial-gradient(circle, rgba(255, 42, 85, 0.15) 0%, rgba(255, 0, 40, 0.55) 100%);
+            box-shadow: inset 0 0 90px rgba(255, 0, 40, 0.9);
+            opacity: 0;
+            transition: opacity 0.15s ease-out;
+        }
+
+        .red-flash-overlay.active {
+            opacity: 1;
+        }
+
+        /* =========================================
+           5. ZAMAN BARI KALP ATIŞI ANİMASYONU
+           ========================================= */
+        @keyframes heartbeatBar {
+            0% { transform: scaleY(1) scaleX(1); box-shadow: 0 0 12px #ff2a55; }
+            20% { transform: scaleY(1.35) scaleX(1.01); box-shadow: 0 0 26px #ff0033, 0 0 40px #ff2a55; }
+            40% { transform: scaleY(1) scaleX(1); box-shadow: 0 0 12px #ff2a55; }
+            60% { transform: scaleY(1.28) scaleX(1.01); box-shadow: 0 0 24px #ff0033; }
+            100% { transform: scaleY(1) scaleX(1); box-shadow: 0 0 12px #ff2a55; }
+        }
+
+        .timer-danger {
+            background: linear-gradient(90deg, #ff0033, #ff2a55, #ff5e7e) !important;
+            animation: heartbeatBar 0.75s infinite ease-in-out;
+        }
+
+        /* Harf Kutucukları */
+        .letter-slot {
+            transition: all 0.25s ease;
+        }
+        .letter-slot.revealed {
+            background: rgba(255, 0, 234, 0.28);
+            border-color: var(--neon-pink);
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-pink);
+            transform: scale(1.06);
+        }
+        .letter-slot.typed {
+            background: rgba(0, 243, 255, 0.22);
+            border-color: var(--neon-blue);
+            color: #fff;
+            text-shadow: 0 0 8px var(--neon-blue);
+        }
+        .letter-slot.correct-pop {
+            background: rgba(0, 255, 136, 0.3);
+            border-color: var(--neon-green);
+            box-shadow: 0 0 18px rgba(0, 255, 136, 0.7);
+            transform: scale(1.08);
+        }
+
+        /* Özel Kaydırma Çubuğu */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(10, 8, 28, 0.8);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--neon-blue), var(--neon-pink));
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-pink-500 selection:text-white">
+
+    <!-- Arka Plan ve Akan Neon Izgara -->
+    <div class="cyber-bg"></div>
+    <div class="cyber-grid-wrapper">
+        <div class="cyber-grid"></div>
+    </div>
+
+    <!-- Yanlış Cevap Kırmızı Parlama Katmanı -->
+    <div id="red-flash" class="red-flash-overlay"></div>
+
+    <!-- =========================================================
+         EKRAN 1: AÇILIŞ (YÜKLEME) EKRANI
+         ========================================================= -->
+    <section id="splash-screen" class="fixed inset-0 z-40 flex flex-col items-center justify-center bg-[#060414]/95 backdrop-blur-md transition-opacity duration-700">
+        <div class="loader-ring mb-8">
+            <!-- Neon Tüy Kalem / Lir SVG Simgesi -->
+            <svg class="w-12 h-12 text-[#00f3ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" stroke="#ff00ea"></path>
+                <line x1="16" y1="8" x2="2" y2="22" stroke="#00f3ff"></line>
+                <line x1="17.5" y1="15" x2="9" y2="15" stroke="#00f3ff"></line>
+            </svg>
+        </div>
+        <h2 class="font-cyber text-2xl sm:text-3xl font-extrabold tracking-[0.25em] text-transparent bg-clip-text bg-gradient-to-r from-[#00f3ff] via-white to-[#ff00ea] animate-pulse">
+            YÜKLENİYOR...
+        </h2>
+        <p class="mt-3 text-xs sm:text-sm text-cyan-200/75 tracking-widest uppercase">
+            10. Sınıf Türk Dili ve Edebiyatı • Sözün Ezgisi
+        </p>
+        <div class="w-56 sm:w-72 h-1.5 bg-slate-800/80 rounded-full overflow-hidden mt-6 border border-cyan-500/30">
+            <div id="splash-progress" class="h-full bg-gradient-to-r from-[#00f3ff] to-[#ff00ea] w-0 transition-all duration-300"></div>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         ANA UYGULAMA KAPSAYICISI
+         ========================================================= -->
+    <main id="app-container" class="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 max-w-5xl w-full mx-auto relative z-10">
+
+        <!-- Üst Başlık & Ses Kontrolü -->
+        <header class="w-full flex items-center justify-between mb-4 sm:mb-6">
+            <div class="flex items-center gap-2.5">
+                <span class="inline-block w-3 h-3 rounded-full bg-[#00f3ff] shadow-[0_0_10px_#00f3ff]"></span>
+                <span class="font-cyber text-xs sm:text-sm tracking-widest text-cyan-300 uppercase">TDE 10 • SÖZÜN EZGİSİ</span>
+            </div>
+            <button id="sound-toggle-btn" type="button" class="glass-panel px-3 py-1.5 text-xs sm:text-sm flex items-center gap-2 text-cyan-200 hover:text-white transition cursor-pointer" title="Ses Efektlerini Aç/Kapat">
+                <span id="sound-icon">🔊</span>
+                <span class="hidden sm:inline">Ses Açık</span>
+            </button>
+        </header>
+
+        <!-- =========================================================
+             EKRAN 2: ANA MENÜ & LİDERLİK TABLOSU
+             ========================================================= -->
+        <section id="menu-screen" class="w-full hidden animate-fade-in">
+            <div class="text-center mb-6 sm:mb-8">
+                <div class="inline-block px-4 py-1 rounded-full border border-pink-500/50 bg-pink-500/10 text-pink-300 text-xs font-semibold tracking-wider uppercase mb-3">
+                    Etkileşimli Edebiyat Arenası • 30 Soru
+                </div>
+                <h1 class="font-cyber text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#00f3ff] via-white to-[#ff00ea] drop-shadow-[0_0_18px_rgba(0,243,255,0.4)]">
+                    SÖZÜN EZGİSİ
+                </h1>
+                <p class="mt-2 sm:mt-3 text-sm sm:text-base text-slate-300 max-w-2xl mx-auto">
+                    Şiir ve Ahenk Unsurları, Türk Edebiyatı Dönemleri, Masal-Türkü Yapısı ve Tamlamalar bilgini test et! Hızlı cevapla, yüksek puan topla ve zirveye adını yazdır.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                <!-- Sol Kart: Oyuncu Girişi ve Kurallar -->
+                <div class="lg:col-span-7 glass-panel p-6 sm:p-8 flex flex-col justify-between">
+                    <div>
+                        <h2 class="font-cyber text-lg sm:text-xl font-bold text-[#00f3ff] neon-text-blue mb-4 flex items-center gap-2">
+                            <span>⚡</span> YARIŞMACI GİRİŞİ
+                        </h2>
+
+                        <label for="player-name-input" class="block text-xs sm:text-sm font-semibold text-cyan-200 uppercase tracking-wider mb-2">
+                            Adınız ve Soyadınız / Rumuzunuz
+                        </label>
+                        <input 
+                            type="text" 
+                            id="player-name-input" 
+                            maxlength="22"
+                            placeholder="Örn: Yunus Emre" 
+                            class="w-full px-4 py-3.5 rounded-xl bg-[#09061d]/90 border-2 border-cyan-400/50 focus:border-[#ff00ea] focus:outline-none text-white placeholder-slate-500 text-base sm:text-lg font-semibold shadow-[inset_0_0_12px_rgba(0,243,255,0.15)] transition"
+                        />
+                        <p id="name-error-msg" class="text-rose-400 text-xs mt-1.5 hidden font-medium">
+                            ⚠️ Lütfen oyuna başlamadan önce bir oyuncu adı girin.
+                        </p>
+
+                        <!-- Oyun Kuralları Özeti -->
+                        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
+                            <div class="p-3 rounded-xl bg-white/5 border border-cyan-500/25 flex items-start gap-2.5">
+                                <span class="text-lg">⏱️</span>
+                                <div>
+                                    <strong class="text-cyan-300 block">30 Saniye & Hız Bonusu</strong>
+                                    <span class="text-slate-300 text-xs">Her soru 100 puan + kalan her saniye için +5 hız bonusu!</span>
+                                </div>
+                            </div>
+                            <div class="p-3 rounded-xl bg-white/5 border border-pink-500/25 flex items-start gap-2.5">
+                                <span class="text-lg">💡</span>
+                                <div>
+                                    <strong class="text-pink-300 block">Harf Satın Alma (-20 Puan)</strong>
+                                    <span class="text-slate-300 text-xs">Zorlandığında 20 puan karşılığında ipucu harf açabilirsin.</span>
+                                </div>
+                            </div>
+                            <div class="p-3 rounded-xl bg-white/5 border border-purple-500/25 flex items-start gap-2.5">
+                                <span class="text-lg">⌨️</span>
+                                <div>
+                                    <strong class="text-purple-300 block">Klavye ile Yanıtla</strong>
+                                    <span class="text-slate-300 text-xs">Cevabını doğrudan klavyeden yazıp Enter tuşuyla onayla.</span>
+                                </div>
+                            </div>
+                            <div class="p-3 rounded-xl bg-white/5 border border-amber-500/25 flex items-start gap-2.5">
+                                <span class="text-lg">👑</span>
+                                <div>
+                                    <strong class="text-amber-300 block">Liderlik Tablosu</strong>
+                                    <span class="text-slate-300 text-xs">En yüksek 5 skor cihazına kaydedilir ve taç kazanır.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-white/10">
+                        <button id="start-game-btn" type="button" class="w-full btn-neon-primary py-4 px-6 rounded-xl font-cyber text-base sm:text-lg font-extrabold tracking-wider text-white uppercase cursor-pointer flex items-center justify-center gap-3">
+                            <span>OYUNU BAŞLAT</span>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sağ Kart: Liderlik Tablosu (En İyi 5) -->
+                <div class="lg:col-span-5 glass-panel-pink p-6 sm:p-8 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="font-cyber text-lg sm:text-xl font-bold text-[#ff00ea] neon-text-pink flex items-center gap-2">
+                                <span>👑</span> LİDERLİK TABLOSU
+                            </h2>
+                            <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-pink-500/20 border border-pink-400/40 text-pink-200">İLK 5 SKOR</span>
+                        </div>
+
+                        <div id="leaderboard-list" class="space-y-2.5">
+                            <!-- JS ile doldurulacak -->
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+                        <span>Veriler tarayıcıya kaydedilir</span>
+                        <button id="clear-scores-btn" type="button" class="text-pink-400 hover:text-pink-300 underline cursor-pointer">
+                            Tabloyu Sıfırla
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             EKRAN 3: AKTİF OYUN EKRANI
+             ========================================================= -->
+        <section id="game-screen" class="w-full hidden">
+            <!-- Üst Bilgi Paneli (HUD) -->
+            <div class="glass-panel p-4 sm:p-5 mb-4 sm:mb-6">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                    <!-- Oyuncu ve Soru Sayacı -->
+                    <div class="flex items-center gap-3">
+                        <div class="px-3.5 py-1.5 rounded-xl bg-cyan-500/15 border border-cyan-400/40">
+                            <span class="text-[11px] text-cyan-300 block uppercase">Soru</span>
+                            <span id="question-counter" class="font-cyber text-base sm:text-lg font-bold text-white">1 / 30</span>
+                        </div>
+                        <div class="px-3.5 py-1.5 rounded-xl bg-purple-500/15 border border-purple-400/40">
+                            <span class="text-[11px] text-purple-300 block uppercase">Konu</span>
+                            <span id="question-topic" class="text-xs sm:text-sm font-semibold text-white">Şiir ve Ahenk</span>
+                        </div>
+                    </div>
+
+                    <!-- Puan Göstergesi -->
+                    <div class="flex items-center gap-3">
+                        <div class="px-4 py-1.5 rounded-xl bg-pink-500/15 border border-pink-400/50 text-right">
+                            <span class="text-[11px] text-pink-300 block uppercase">Toplam Puan</span>
+                            <span id="score-display" class="font-cyber text-xl sm:text-2xl font-black text-[#00f3ff] neon-text-blue">100</span>
+                        </div>
+                        <button id="quit-game-btn" type="button" class="p-2.5 rounded-xl bg-white/5 hover:bg-rose-500/20 border border-white/15 hover:border-rose-400/50 text-slate-300 hover:text-rose-200 transition cursor-pointer" title="Ana Menüye Dön">
+                            ✕
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 30 Saniyelik Zaman Barı -->
+                <div class="w-full">
+                    <div class="flex justify-between items-center text-xs mb-1">
+                        <span class="text-cyan-200 font-medium flex items-center gap-1.5">
+                            <span>⏱️ Kalan Süre</span>
+                            <span id="speed-bonus-badge" class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[11px]">Hız Bonusu: +150</span>
+                        </span>
+                        <span id="timer-text" class="font-cyber font-bold text-sm text-cyan-300">30 sn</span>
+                    </div>
+                    <div class="w-full h-3 bg-slate-900/90 rounded-full p-0.5 border border-cyan-500/30 overflow-hidden">
+                        <div id="timer-bar" class="h-full w-full rounded-full bg-gradient-to-r from-[#00f3ff] via-[#9d00ff] to-[#ff00ea] transition-all duration-200"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Soru ve Cevap Alanı -->
+            <div id="question-card" class="glass-panel-pink p-5 sm:p-8 relative overflow-hidden">
+                <!-- Bildirim Mesajı (Toast / Alert yerine özel kutu) -->
+                <div id="feedback-banner" class="hidden mb-4 px-4 py-2.5 rounded-xl text-center font-semibold text-sm sm:text-base transition-all"></div>
+
+                <!-- Soru Metni -->
+                <div class="mb-6 text-center">
+                    <span class="inline-block text-xs font-cyber tracking-widest text-pink-400 uppercase mb-2">SORU</span>
+                    <h3 id="question-text" class="text-lg sm:text-2xl font-bold text-white leading-relaxed">
+                        Soru yükleniyor...
+                    </h3>
+                </div>
+
+                <!-- Cevap Harf Kutucukları (Görsel Gösterim) -->
+                <div id="letter-boxes-container" class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 mb-6 min-h-[3.25rem]">
+                    <!-- JS ile harf kutucukları oluşturulacak -->
+                </div>
+
+                <!-- Klavye Giriş Alanı -->
+                <div class="max-w-xl mx-auto mb-6">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="answer-input" 
+                            autocomplete="off"
+                            spellcheck="false"
+                            placeholder="Cevabınızı klavyeden yazın..." 
+                            class="w-full px-5 py-3.5 sm:py-4 rounded-xl bg-[#070418]/90 border-2 border-[#00f3ff]/60 focus:border-[#ff00ea] focus:outline-none text-center font-cyber text-lg sm:text-xl tracking-widest uppercase text-white placeholder-slate-500 shadow-[0_0_20px_rgba(0,243,255,0.2)] transition"
+                        />
+                    </div>
+                    <p class="text-center text-[11px] sm:text-xs text-slate-400 mt-2">
+                        İpucu: Cevabınızı yazdıktan sonra <kbd class="px-1.5 py-0.5 bg-white/10 rounded border border-white/20 text-cyan-300">Enter</kbd> tuşuna basabilir veya "Cevabı Onayla" butonunu kullanabilirsiniz.
+                    </p>
+                </div>
+
+                <!-- Aksiyon Butonları (Harf Al, Pas Geç, Cevabı Onayla) -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+                    <button id="buy-letter-btn" type="button" class="w-full sm:w-auto btn-neon-hint px-5 py-3.5 rounded-xl font-bold text-sm sm:text-base text-white flex items-center justify-center gap-2 cursor-pointer">
+                        <span>💡 Harf Al</span>
+                        <span class="px-2 py-0.5 rounded-md bg-black/40 text-pink-300 font-cyber text-xs">-20 Puan</span>
+                    </button>
+
+                    <button id="submit-answer-btn" type="button" class="w-full sm:w-auto btn-neon-primary px-8 py-3.5 rounded-xl font-cyber font-extrabold text-sm sm:text-base text-white tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer">
+                        <span>CEVABI ONAYLA</span>
+                        <span>✓</span>
+                    </button>
+
+                    <button id="skip-question-btn" type="button" class="w-full sm:w-auto px-4 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/20 text-slate-300 hover:text-white text-xs sm:text-sm font-semibold transition cursor-pointer">
+                        Soruyu Geç ⏭️
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             EKRAN 4: OYUN SONU (SONUÇ) EKRANI
+             ========================================================= -->
+        <section id="result-screen" class="w-full max-w-2xl hidden">
+            <div class="glass-panel p-6 sm:p-10 text-center">
+                <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-tr from-[#00f3ff]/20 to-[#ff00ea]/20 border-2 border-[#00f3ff] flex items-center justify-center text-4xl shadow-[0_0_25px_rgba(0,243,255,0.5)]">
+                    🏆
+                </div>
+                <h2 class="font-cyber text-2xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#00f3ff] to-[#ff00ea]">
+                    YARIŞMA TAMAMLANDI!
+                </h2>
+                <p id="result-player-msg" class="mt-2 text-slate-300 text-sm sm:text-base">
+                    Tebrikler!
+                </p>
+
+                <!-- İstatistik Kutuları -->
+                <div class="grid grid-cols-3 gap-3 sm:gap-4 my-6">
+                    <div class="p-3 sm:p-4 rounded-xl bg-white/5 border border-cyan-400/40">
+                        <span class="text-[11px] text-cyan-300 uppercase block">Final Puanı</span>
+                        <span id="final-score" class="font-cyber text-xl sm:text-3xl font-black text-white">0</span>
+                    </div>
+                    <div class="p-3 sm:p-4 rounded-xl bg-white/5 border border-emerald-400/40">
+                        <span class="text-[11px] text-emerald-300 uppercase block">Doğru Sayısı</span>
+                        <span id="final-correct" class="font-cyber text-xl sm:text-3xl font-black text-emerald-400">0/30</span>
+                    </div>
+                    <div class="p-3 sm:p-4 rounded-xl bg-white/5 border border-pink-400/40">
+                        <span class="text-[11px] text-pink-300 uppercase block">Alınan Harf</span>
+                        <span id="final-hints" class="font-cyber text-xl sm:text-3xl font-black text-pink-400">0</span>
+                    </div>
+                </div>
+
+                <!-- Güncel Liderlik Tablosu Özeti -->
+                <div class="text-left mb-6">
+                    <h3 class="font-cyber text-sm font-bold text-[#ff00ea] mb-2.5 flex items-center gap-1.5">
+                        <span>👑</span> EN İYİ 5 SKOR TABLOSU
+                    </h3>
+                    <div id="result-leaderboard-list" class="space-y-2"></div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button id="play-again-btn" type="button" class="btn-neon-primary px-6 py-3.5 rounded-xl font-cyber font-bold text-sm sm:text-base text-white uppercase cursor-pointer">
+                        🔄 Tekrar Oyna
+                    </button>
+                    <button id="back-to-menu-btn" type="button" class="px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/25 font-semibold text-sm sm:text-base text-white transition cursor-pointer">
+                        🏠 Ana Menü
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Özel Onay Modali (confirm() yerine) -->
+    <div id="confirm-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+        <div class="glass-panel max-w-sm w-full p-6 text-center">
+            <h4 id="modal-title" class="font-cyber text-lg font-bold text-[#00f3ff] mb-2">Emin misiniz?</h4>
+            <p id="modal-desc" class="text-sm text-slate-300 mb-6">Bu işlem geri alınamaz.</p>
+            <div class="flex gap-3 justify-center">
+                <button id="modal-cancel-btn" type="button" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-sm font-semibold text-white cursor-pointer">Vazgeç</button>
+                <button id="modal-confirm-btn" type="button" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-sm font-semibold text-white shadow-[0_0_12px_rgba(225,29,72,0.6)] cursor-pointer">Onayla</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * ============================================================================
+         * 10. SINIF TÜRK DİLİ VE EDEBİYATI - "SÖZÜN EZGİSİ" ÜNİTESİ (30 SORU)
+         * Konular:
+         * 1. Şiir ve Ahenk Unsurları (Nazım birimi, ölçü, kafiye çeşitleri, redif)
+         * 2. Türk Edebiyatı Dönemleri (İslamiyet Öncesi törenler/ürünler, İslami ve Batı Etkisi)
+         * 3. Masal ve Türkü Yapısı (Bent, kavuştak; döşeme, serim, düğüm, çözüm, dilek)
+         * 4. Dil Bilgisi (Belirtili, belirtisiz, zincirleme isim tamlamaları & sıfat tamlamaları)
+         * ============================================================================
+         */
+        const QUESTIONS_BANK = [
+            // --- 1. ŞİİR VE AHENK UNSURLARI ---
+            {
+                topic: "Şiir ve Ahenk Unsurları",
+                question: "Dize sonlarında yazılışları, okunuşları ve görevleri aynı olan ek veya kelimelerin tekrarlanmasına ne ad verilir?",
+                answer: "REDİF"
+            },
+            {
+                topic: "Şiir ve Ahenk Unsurları",
+                question: "Dize sonlarındaki tek ses benzerliğine dayanan uyak çeşidi hangisidir?",
+                answer: "YARIM KAFİYE"
+            },
+            {
+                topic: "Şiir ve Ahenk Unsurları",
+                question: "Dize sonlarında iki ses benzerliğine dayanan kafiye türü nedir?",
+                answer: "TAM KAFİYE"
+            },
+            {
+                topic: "Şiir ve Ahenk Unsurları",
+                question: "İkiden fazla ses benzerliğine dayanan uyak çeşidine ne denir?",
+                answer: "ZENGİN KAFİYE"
+            },
+            {
+                topic: "Şiir ve Ahenk Unsurları",
+                question: "Yazılışları ve okunuşları aynı, anlamları farklı sözcüklerin dize sonunda oluşturduğu kafiye türü hangisidir?",
+                answer: "CİNASLI KAFİYE"
+            },
+            {
+                topic: "Şiir ve Ahenk Unsurları",
+                question: "Halk şiirinde kullanılan ve dizelerdeki hece sayılarının eşitliğine dayanan ölçü birimi nedir?",
+                answer: "HECE ÖLÇÜSÜ"
+            },
+            {
+                topic: "Şiir ve Ahenk Unsurları",
+                question: "Divan edebiyatında kullanılan ve hecelerin uzunluk-kısalık (açıklık-kapalılık) değerine dayanan ölçü hangisidir?",
+                answer: "ARUZ ÖLÇÜSÜ"
+            },
+            {
+                topic: "Şiir ve Ahenk Unsurları",
+                question: "Herhangi bir ölçü kuralına bağlı kalmadan şairin iç ritmine göre yazdığı ölçü türü nedir?",
+                answer: "SERBEST ÖLÇÜ"
+            },
+            {
+                topic: "Şiir ve Ahenk Unsurları",
+                question: "Dört dizeden oluşan ve halk edebiyatında yaygın olarak kullanılan nazım birimi hangisidir?",
+                answer: "DÖRTLÜK"
+            },
+            {
+                topic: "Şiir ve Ahenk Unsurları",
+                question: "Divan edebiyatında en yaygın kullanılan, anlam bütünlüğü taşıyan iki dizelik nazım birimi nedir?",
+                answer: "BEYİT"
+            },
+
+            // --- 2. TÜRK EDEBİYATI DÖNEMLERİ ---
+            {
+                topic: "Türk Edebiyatı Dönemleri",
+                question: "İslamiyet öncesi Türk toplumunda sevilen bir kişinin ölümünden duyulan üzüntüyü dile getiren ve 'yuğ' törenlerinde söylenen şiir türü nedir?",
+                answer: "SAGU"
+            },
+            {
+                topic: "Türk Edebiyatı Dönemleri",
+                question: "İslamiyet öncesi dönemde 'sığır' adı verilen av törenleri ile 'şölen'lerde kopuz eşliğinde söylenen aşk, doğa ve yiğitlik şiirlerine ne denir?",
+                answer: "KOŞUK"
+            },
+            {
+                topic: "Türk Edebiyatı Dönemleri",
+                question: "İslamiyet öncesi sözlü edebiyat döneminde günümüzdeki atasözlerinin karşılığı olan özlü sözlere ne ad verilir?",
+                answer: "SAV"
+            },
+            {
+                topic: "Türk Edebiyatı Dönemleri",
+                question: "İslamiyet öncesi dönemde toplumu derinden etkileyen göç, savaş ve kahramanlık olaylarını anlatan uzun manzum eserlere ne denir?",
+                answer: "DESTAN"
+            },
+            {
+                topic: "Türk Edebiyatı Dönemleri",
+                question: "İslamiyet öncesi Türklerde ölen kişilerin ardından düzenlenen yas ve cenaze törenlerine verilen ad nedir?",
+                answer: "YUĞ"
+            },
+            {
+                topic: "Türk Edebiyatı Dönemleri",
+                question: "İslamiyet öncesi dönemde düzenlenen ve kurbanların kesilip şenliklerin yapıldığı genel ziyafet törenlerine ne denir?",
+                answer: "ŞÖLEN"
+            },
+            {
+                topic: "Türk Edebiyatı Dönemleri",
+                question: "İslamiyet öncesi Türklerde sürek avı şeklinde düzenlenen geleneksel av törenlerinin adı nedir?",
+                answer: "SIĞIR"
+            },
+            {
+                topic: "Türk Edebiyatı Dönemleri",
+                question: "1860 yılında Şinasi ve Agâh Efendi'nin Tercüman-ı Ahval gazetesini çıkarmasıyla başlayan edebiyat dönemi hangisidir?",
+                answer: "TANZİMAT EDEBİYATI"
+            },
+
+            // --- 3. MASAL VE TÜRKÜ YAPISI ---
+            {
+                topic: "Masal ve Türkü Yapısı",
+                question: "Türkülerde asıl sözlerin yer aldığı ve her kıtada değişen bölümlere ne ad verilir?",
+                answer: "BENT"
+            },
+            {
+                topic: "Masal ve Türkü Yapısı",
+                question: "Türkülerde her bendin sonunda tekrarlanan nakarat bölümüne ne denir?",
+                answer: "KAVUŞTAK"
+            },
+            {
+                topic: "Masal ve Türkü Yapısı",
+                question: "Masalların başında dinleyicinin ilgisini çekmek için 'Evvel zaman içinde...' gibi tekerlemelerin söylendiği bölüm hangisidir?",
+                answer: "DÖŞEME"
+            },
+            {
+                topic: "Masal ve Türkü Yapısı",
+                question: "Masallarda olayların ve kahramanların tanıtıldığı, 'Bir varmış, bir yokmuş' ifadeleriyle giriş yapılan bölüm nedir?",
+                answer: "SERİM"
+            },
+            {
+                topic: "Masal ve Türkü Yapısı",
+                question: "Masallarda olayların karmaşıklaştığı, merak ögesinin ve çatışmanın en üst seviyeye çıktığı bölüm hangisidir?",
+                answer: "DÜĞÜM"
+            },
+            {
+                topic: "Masal ve Türkü Yapısı",
+                question: "Masallarda iyilerin ödüllendirildiği, kötülerin cezalandırıldığı ve çatışmanın sona erdiği bölüm nedir?",
+                answer: "ÇÖZÜM"
+            },
+            {
+                topic: "Masal ve Türkü Yapısı",
+                question: "Masalların sonunda anlatıcının 'Onlar ermiş muradına, biz çıkalım kerevetine' gibi iyi temennilerde bulunduğu bölüm hangisidir?",
+                answer: "DİLEK"
+            },
+
+            // --- 4. DİL BİLGİSİ (İSİM VE SIFAT TAMLAMALARI) ---
+            {
+                topic: "İsim ve Sıfat Tamlamaları",
+                question: "Hem tamlayanın (-ın, -in) hem de tamlananın (-ı, -i) ek aldığı isim tamlaması türü hangisidir?",
+                answer: "BELİRTİLİ İSİM TAMLAMASI"
+            },
+            {
+                topic: "İsim ve Sıfat Tamlamaları",
+                question: "'Şiir defteri' ve 'edebiyat dünyası' örneklerinde olduğu gibi sadece tamlananın ek aldığı tamlama türü nedir?",
+                answer: "BELİRTİSİZ İSİM TAMLAMASI"
+            },
+            {
+                topic: "İsim ve Sıfat Tamlamaları",
+                question: "'Türk şiirinin ezgisi' örneğinde olduğu gibi en az üç ismin birbirine bağlanmasıyla oluşan tamlama çeşidi hangisidir?",
+                answer: "ZİNCİRLEME İSİM TAMLAMASI"
+            },
+            {
+                topic: "İsim ve Sıfat Tamlamaları",
+                question: "'Kızıl ufuklar' ve 'yanık türkü' örneklerinde olduğu gibi bir ismin önüne gelerek onu niteleyen veya belirten sözcüklerle kurulan tamlama nedir?",
+                answer: "SIFAT TAMLAMASI"
+            },
+            {
+                topic: "İsim ve Sıfat Tamlamaları",
+                question: "Bir isim tamlamasında birinci unsura 'tamlayan', ikinci unsura ise ne ad verilir?",
+                answer: "TAMLANAN"
+            }
+        ];
+
+        /**
+         * ============================================================================
+         * SES SENTEZLEYİCİ (TONE.JS - Harici ses dosyası gerektirmez)
+         * ============================================================================
+         */
+        let soundEnabled = true;
+        let synth = null;
+
+        function initAudio() {
+            if (!synth && typeof Tone !== 'undefined') {
+                synth = new Tone.PolySynth(Tone.Synth).toDestination();
+                synth.volume.value = -8;
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                if (!synth) return;
+                if (Tone.context.state !== 'running') {
+                    Tone.start();
+                }
+                const now = Tone.now();
+                if (type === 'correct') {
+                    synth.triggerAttackRelease(["C5", "E5", "G5"], "16n", now);
+                    synth.triggerAttackRelease(["C6"], "8n", now + 0.12);
+                } else if (type === 'wrong') {
+                    synth.triggerAttackRelease(["F2", "F#2"], "8n", now);
+                } else if (type === 'hint') {
+                    synth.triggerAttackRelease(["A5", "E6"], "32n", now);
+                } else if (type === 'click') {
+                    synth.triggerAttackRelease(["G5"], "64n", now);
+                } else if (type === 'finish') {
+                    synth.triggerAttackRelease(["C5", "E5", "G5", "B5"], "8n", now);
+                    synth.triggerAttackRelease(["C6"], "4n", now + 0.25);
+                }
+            } catch (e) {
+                // Ses hatası oyun akışını engellemez
+            }
+        }
+
+        /**
+         * ============================================================================
+         * TÜRKÇE KARAKTER DUYARLI NORMALİZASYON YARDIMCILARI
+         * ============================================================================
+         */
+        function toTurkishUpper(str) {
+            return str
+                .replace(/i/g, 'İ')
+                .replace(/ı/g, 'I')
+                .replace(/ğ/g, 'Ğ')
+                .replace(/ü/g, 'Ü')
+                .replace(/ş/g, 'Ş')
+                .replace(/ö/g, 'Ö')
+                .replace(/ç/g, 'Ç')
+                .toUpperCase();
+        }
+
+        function normalizeAnswer(str) {
+            return toTurkishUpper(str.trim().replace(/\s+/g, ' '));
+        }
+
+        /**
+         * ============================================================================
+         * OYUN DURUMU (STATE) & DOM ELEMANLARI
+         * ============================================================================
+         */
+        const STORAGE_KEY = 'tde_sozun_ezgisi_leaderboard_v1';
+        const INITIAL_SCORE = 100; // Başlangıçta 1-2 harf alınabilmesi için 100 puan
+        const HINT_COST = 20;
+        const QUESTION_TIME = 30;
+
+        let state = {
+            playerName: '',
+            questions: [],
+            currentIndex: 0,
+            score: INITIAL_SCORE,
+            correctCount: 0,
+            hintsUsedCount: 0,
+            timeLeft: QUESTION_TIME,
+            timerInterval: null,
+            revealedIndices: new Set(),
+            isTransitioning: false
+        };
+
+        // DOM Referansları
+        const splashScreen = document.getElementById('splash-screen');
+        const splashProgress = document.getElementById('splash-progress');
+        const menuScreen = document.getElementById('menu-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const resultScreen = document.getElementById('result-screen');
+
+        const playerNameInput = document.getElementById('player-name-input');
+        const nameErrorMsg = document.getElementById('name-error-msg');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const leaderboardList = document.getElementById('leaderboard-list');
+        const clearScoresBtn = document.getElementById('clear-scores-btn');
+
+        const questionCounter = document.getElementById('question-counter');
+        const questionTopic = document.getElementById('question-topic');
+        const scoreDisplay = document.getElementById('score-display');
+        const speedBonusBadge = document.getElementById('speed-bonus-badge');
+        const timerText = document.getElementById('timer-text');
+        const timerBar = document.getElementById('timer-bar');
+        const questionCard = document.getElementById('question-card');
+        const feedbackBanner = document.getElementById('feedback-banner');
+        const questionText = document.getElementById('question-text');
+        const letterBoxesContainer = document.getElementById('letter-boxes-container');
+        const answerInput = document.getElementById('answer-input');
+        const buyLetterBtn = document.getElementById('buy-letter-btn');
+        const submitAnswerBtn = document.getElementById('submit-answer-btn');
+        const skipQuestionBtn = document.getElementById('skip-question-btn');
+        const quitGameBtn = document.getElementById('quit-game-btn');
+        const redFlash = document.getElementById('red-flash');
+
+        const soundToggleBtn = document.getElementById('sound-toggle-btn');
+        const soundIcon = document.getElementById('sound-icon');
+
+        /**
+         * ============================================================================
+         * 1. AÇILIŞ EKRANI AKIŞI
+         * ============================================================================
+         */
+        window.addEventListener('DOMContentLoaded', () => {
+            renderLeaderboard();
+
+            // Yükleme çubuğu animasyonu
+            setTimeout(() => { splashProgress.style.width = '45%'; }, 150);
+            setTimeout(() => { splashProgress.style.width = '85%'; }, 600);
+            setTimeout(() => { splashProgress.style.width = '100%'; }, 1050);
+
+            // İçerik hazır olunca açılış ekranını gizle ve ana menüyü göster
+            setTimeout(() => {
+                splashScreen.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => {
+                    splashScreen.classList.add('hidden');
+                    menuScreen.classList.remove('hidden');
+                    playerNameInput.focus();
+                }, 600);
+            }, 1450);
+        });
+
+        /**
+         * ============================================================================
+         * 2. LİDERLİK TABLOSU (LOCALSTORAGE - EN İYİ 5 SKOR & KRAL TACI)
+         * ============================================================================
+         */
+        function getLeaderboard() {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY);
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveScoreToLeaderboard(name, score, correctCount) {
+            const board = getLeaderboard();
+            board.push({
+                name: name,
+                score: score,
+                correct: correctCount,
+                date: new Date().toLocaleDateString('tr-TR')
+            });
+            // Puana göre azalan sırala ve en iyi 5'i tut
+            board.sort((a, b) => b.score - a.score);
+            const top5 = board.slice(0, 5);
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(top5));
+            } catch (e) {}
+            return top5;
+        }
+
+        function renderLeaderboard(targetElement = leaderboardList) {
+            const board = getLeaderboard();
+            targetElement.innerHTML = '';
+
+            if (board.length === 0) {
+                targetElement.innerHTML = `
+                    <div class="p-5 rounded-xl bg-white/5 border border-dashed border-pink-400/30 text-center text-slate-400 text-xs sm:text-sm">
+                        Henüz kaydedilmiş bir skor yok.<br>İlk oynayan sen ol ve kral tacını kap! 👑
+                    </div>
+                `;
+                return;
+            }
+
+            board.forEach((entry, idx) => {
+                const isFirst = idx === 0;
+                const row = document.createElement('div');
+                row.className = `flex items-center justify-between px-4 py-2.5 rounded-xl border transition ${
+                    isFirst 
+                        ? 'bg-gradient-to-r from-amber-500/20 via-pink-500/15 to-cyan-500/20 border-amber-400/60 shadow-[0_0_15px_rgba(251,191,36,0.25)]' 
+                        : 'bg-white/5 border-white/10'
+                }`;
+
+                row.innerHTML = `
+                    <div class="flex items-center gap-2.5 overflow-hidden">
+                        <span class="font-cyber text-xs font-bold w-5 text-center ${isFirst ? 'text-amber-300' : 'text-cyan-300'}">
+                            #${idx + 1}
+                        </span>
+                        <span class="text-base" title="Liderlik Tacı">👑</span>
+                        <span class="font-semibold text-sm text-white truncate">${escapeHTML(entry.name)}</span>
+                    </div>
+                    <div class="flex items-center gap-3 shrink-0">
+                        <span class="text-[11px] text-slate-400 hidden sm:inline">${entry.correct}/30 D</span>
+                        <span class="font-cyber font-bold text-sm ${isFirst ? 'text-amber-300' : 'text-[#00f3ff]'}">${entry.score} P</span>
+                    </div>
+                `;
+                targetElement.appendChild(row);
+            });
+        }
+
+        function escapeHTML(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        /**
+         * ============================================================================
+         * 3. OYUN BAŞLATMA VE SORU YÖNETİMİ
+         * ============================================================================
+         */
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function startGame() {
+            const rawName = playerNameInput.value.trim();
+            if (!rawName) {
+                nameErrorMsg.classList.remove('hidden');
+                playerNameInput.classList.add('border-rose-500');
+                playerNameInput.focus();
+                playSound('wrong');
+                return;
+            }
+
+            nameErrorMsg.classList.add('hidden');
+            playerNameInput.classList.remove('border-rose-500');
+            playSound('click');
+
+            state = {
+                playerName: rawName,
+                questions: shuffleArray(QUESTIONS_BANK),
+                currentIndex: 0,
+                score: INITIAL_SCORE,
+                correctCount: 0,
+                hintsUsedCount: 0,
+                timeLeft: QUESTION_TIME,
+                timerInterval: null,
+                revealedIndices: new Set(),
+                isTransitioning: false
+            };
+
+            menuScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+
+            updateScoreUI();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            clearInterval(state.timerInterval);
+            state.isTransitioning = false;
+            state.revealedIndices.clear();
+            state.timeLeft = QUESTION_TIME;
+
+            const currentQ = state.questions[state.currentIndex];
+            questionCounter.textContent = `${state.currentIndex + 1} / ${state.questions.length}`;
+            questionTopic.textContent = currentQ.topic;
+            questionText.textContent = currentQ.question;
+
+            answerInput.value = '';
+            answerInput.disabled = false;
+            feedbackBanner.classList.add('hidden');
+
+            renderLetterBoxes();
+            updateHintButtonState();
+            startTimer();
+
+            setTimeout(() => answerInput.focus(), 50);
+        }
+
+        /**
+         * ============================================================================
+         * 4. HARF KUTUCUKLARI & HARF SATIN ALMA (-20 PUAN) SİSTEMİ
+         * ============================================================================
+         */
+        function renderLetterBoxes(isSuccess = false) {
+            const currentQ = state.questions[state.currentIndex];
+            const targetAnswer = normalizeAnswer(currentQ.answer);
+            const typedValue = normalizeAnswer(answerInput.value);
+
+            // Kullanıcının yazdığı harfleri (boşluklar hariç) sırayla eşleştir
+            const typedCharsNoSpace = typedValue.replace(/\s/g, '');
+            let typedPointer = 0;
+
+            letterBoxesContainer.innerHTML = '';
+
+            // Kelimelere bölerek satır kırılmalarının düzgün olmasını sağla
+            const words = targetAnswer.split(' ');
+            let globalCharIndex = 0;
+
+            words.forEach((word, wIdx) => {
+                const wordWrapper = document.createElement('div');
+                wordWrapper.className = 'flex flex-wrap justify-center gap-1 sm:gap-1.5 mx-1.5 my-1';
+
+                for (let i = 0; i < word.length; i++) {
+                    const char = word[i];
+                    const idx = globalCharIndex;
+
+                    const box = document.createElement('div');
+                    box.className = 'letter-slot w-8 h-10 sm:w-10 sm:h-12 rounded-lg border-2 border-cyan-400/40 bg-[#0b0724]/85 flex items-center justify-center font-cyber font-bold text-base sm:text-xl text-cyan-200 shadow-inner';
+
+                    if (isSuccess) {
+                        box.textContent = char;
+                        box.classList.add('correct-pop');
+                    } else if (state.revealedIndices.has(idx)) {
+                        box.textContent = char;
+                        box.classList.add('revealed');
+                        // Eğer kullanıcı o pozisyona bir harf yazdıysa işaretçiyi ilerlet
+                        if (typedPointer < typedCharsNoSpace.length) {
+                            typedPointer++;
+                        }
+                    } else if (typedPointer < typedCharsNoSpace.length) {
+                        box.textContent = typedCharsNoSpace[typedPointer];
+                        box.classList.add('typed');
+                        typedPointer++;
+                    } else {
+                        box.textContent = '';
+                    }
+
+                    wordWrapper.appendChild(box);
+                    globalCharIndex++;
+                }
+
+                letterBoxesContainer.appendChild(wordWrapper);
+                // Boşluk karakteri için indeksi artır
+                if (wIdx < words.length - 1) {
+                    globalCharIndex++;
+                }
+            });
+        }
+
+        function updateHintButtonState() {
+            const currentQ = state.questions[state.currentIndex];
+            const targetAnswer = normalizeAnswer(currentQ.answer);
+            const totalLetters = targetAnswer.replace(/\s/g, '').length;
+
+            // Puan 20'den azsa veya tüm harfler açıldıysa butonu devre dışı bırak
+            if (state.score < HINT_COST || state.revealedIndices.size >= totalLetters) {
+                buyLetterBtn.disabled = true;
+            } else {
+                buyLetterBtn.disabled = false;
+            }
+        }
+
+        function buyLetter() {
+            if (state.isTransitioning) return;
+
+            if (state.score < HINT_COST) {
+                showFeedback('⚠️ Harf satın almak için yeterli puanınız yok! (En az 20 puan gerekli)', 'error');
+                playSound('wrong');
+                updateHintButtonState();
+                return;
+            }
+
+            const currentQ = state.questions[state.currentIndex];
+            const targetAnswer = normalizeAnswer(currentQ.answer);
+
+            // Henüz açılmamış (boşluk olmayan) harf indekslerini bul
+            const unrevealed = [];
+            for (let i = 0; i < targetAnswer.length; i++) {
+                if (targetAnswer[i] !== ' ' && !state.revealedIndices.has(i)) {
+                    unrevealed.push(i);
+                }
+            }
+
+            if (unrevealed.length === 0) {
+                updateHintButtonState();
+                return;
+            }
+
+            // Rastgele bir harf seç ve aç
+            const randomIdx = unrevealed[Math.floor(Math.random() * unrevealed.length)];
+            state.revealedIndices.add(randomIdx);
+            state.score -= HINT_COST;
+            state.hintsUsedCount++;
+
+            playSound('hint');
+            updateScoreUI();
+            renderLetterBoxes();
+            updateHintButtonState();
+            answerInput.focus();
+        }
+
+        /**
+         * ============================================================================
+         * 5. ZAMANLAYICI (30 SN), HIZ BONUSU VE KALP ATIŞI ANİMASYONU
+         * ============================================================================
+         */
+        function startTimer() {
+            updateTimerUI();
+            state.timerInterval = setInterval(() => {
+                state.timeLeft--;
+                updateTimerUI();
+
+                if (state.timeLeft <= 0) {
+                    clearInterval(state.timerInterval);
+                    handleTimeUp();
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            const pct = Math.max(0, (state.timeLeft / QUESTION_TIME) * 100);
+            timerBar.style.width = `${pct}%`;
+            timerText.textContent = `${state.timeLeft} sn`;
+
+            // Hız bonusu: kalan her saniye * 5 puan
+            const potentialBonus = state.timeLeft * 5;
+            speedBonusBadge.textContent = `Hız Bonusu: +${potentialBonus}`;
+
+            // Süre azaldıkça (10 saniye ve altı) kırmızıya dönüp kalp atışı gibi titresin
+            if (state.timeLeft <= 10) {
+                timerBar.classList.add('timer-danger');
+                timerText.classList.remove('text-cyan-300');
+                timerText.classList.add('text-rose-400', 'animate-pulse');
+            } else {
+                timerBar.classList.remove('timer-danger');
+                timerText.classList.add('text-cyan-300');
+                timerText.classList.remove('text-rose-400', 'animate-pulse');
+            }
+        }
+
+        function handleTimeUp() {
+            if (state.isTransitioning) return;
+            state.isTransitioning = true;
+            answerInput.disabled = true;
+
+            const currentQ = state.questions[state.currentIndex];
+            triggerWrongEffect();
+            showFeedback(`⏰ Süre Doldu! Doğru Cevap: ${currentQ.answer}`, 'error');
+
+            setTimeout(() => {
+                nextQuestion();
+            }, 2200);
+        }
+
+        /**
+         * ============================================================================
+         * 6. CEVAP KONTROLÜ, SARSILMA EFEKTİ VE PUANLAMA
+         * ============================================================================
+         */
+        function checkAnswer() {
+            if (state.isTransitioning) return;
+
+            const userAns = normalizeAnswer(answerInput.value);
+            if (!userAns) {
+                answerInput.focus();
+                return;
+            }
+
+            const currentQ = state.questions[state.currentIndex];
+            const correctAns = normalizeAnswer(currentQ.answer);
+
+            if (userAns === correctAns) {
+                // DOĞRU CEVAP
+                state.isTransitioning = true;
+                clearInterval(state.timerInterval);
+                answerInput.disabled = true;
+
+                const basePoints = 100;
+                const speedBonus = state.timeLeft * 5;
+                const earned = basePoints + speedBonus;
+
+                state.score += earned;
+                state.correctCount++;
+
+                playSound('correct');
+                updateScoreUI();
+                renderLetterBoxes(true);
+                showFeedback(`🎉 Harika! +${earned} Puan (100 Temel + ${speedBonus} Hız Bonusu)`, 'success');
+
+                setTimeout(() => {
+                    nextQuestion();
+                }, 1700);
+            } else {
+                // YANLIŞ CEVAP -> Ekran sarsılması ve kırmızı parlama
+                playSound('wrong');
+                triggerWrongEffect();
+                showFeedback('❌ Yanlış cevap! Tekrar dene veya "Harf Al" butonunu kullan.', 'error');
+                answerInput.select();
+            }
+        }
+
+        function triggerWrongEffect() {
+            // Sarsılma animasyonunu sıfırla ve tetikle
+            questionCard.classList.remove('shake-error');
+            void questionCard.offsetWidth; // Reflow
+            questionCard.classList.add('shake-error');
+
+            // Kırmızı parlama katmanını aktif et
+            redFlash.classList.add('active');
+            setTimeout(() => {
+                redFlash.classList.remove('active');
+            }, 320);
+        }
+
+        function showFeedback(message, type) {
+            feedbackBanner.textContent = message;
+            feedbackBanner.classList.remove('hidden', 'bg-emerald-500/20', 'border-emerald-400', 'text-emerald-200', 'bg-rose-500/25', 'border-rose-500', 'text-rose-200');
+
+            if (type === 'success') {
+                feedbackBanner.classList.add('bg-emerald-500/20', 'border', 'border-emerald-400', 'text-emerald-200');
+            } else {
+                feedbackBanner.classList.add('bg-rose-500/25', 'border', 'border-rose-500', 'text-rose-200');
+            }
+        }
+
+        function skipQuestion() {
+            if (state.isTransitioning) return;
+            state.isTransitioning = true;
+            clearInterval(state.timerInterval);
+            answerInput.disabled = true;
+
+            const currentQ = state.questions[state.currentIndex];
+            playSound('click');
+            showFeedback(`⏭️ Soru geçildi. Doğru Cevap: ${currentQ.answer}`, 'error');
+
+            setTimeout(() => {
+                nextQuestion();
+            }, 1600);
+        }
+
+        function nextQuestion() {
+            state.currentIndex++;
+            if (state.currentIndex < state.questions.length) {
+                loadQuestion();
+            } else {
+                finishGame();
+            }
+        }
+
+        function updateScoreUI() {
+            scoreDisplay.textContent = state.score;
+            updateHintButtonState();
+        }
+
+        /**
+         * ============================================================================
+         * 7. OYUN SONU EKRANI
+         * ============================================================================
+         */
+        function finishGame() {
+            clearInterval(state.timerInterval);
+            playSound('finish');
+
+            saveScoreToLeaderboard(state.playerName, state.score, state.correctCount);
+
+            gameScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            document.getElementById('result-player-msg').innerHTML = `Tebrikler <strong class="text-[#00f3ff]">${escapeHTML(state.playerName)}</strong>! 10. Sınıf "Sözün Ezgisi" maratonunu tamamladın.`;
+            document.getElementById('final-score').textContent = state.score;
+            document.getElementById('final-correct').textContent = `${state.correctCount}/30`;
+            document.getElementById('final-hints').textContent = state.hintsUsedCount;
+
+            renderLeaderboard(document.getElementById('result-leaderboard-list'));
+        }
+
+        /**
+         * ============================================================================
+         * 8. OLAY DİNLEYİCİLERİ (EVENT LISTENERS)
+         * ============================================================================
+         */
+        startGameBtn.addEventListener('click', startGame);
+
+        playerNameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') startGame();
+        });
+
+        answerInput.addEventListener('input', () => {
+            renderLetterBoxes(false);
+        });
+
+        answerInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                checkAnswer();
+            }
+        });
+
+        submitAnswerBtn.addEventListener('click', checkAnswer);
+        buyLetterBtn.addEventListener('click', buyLetter);
+        skipQuestionBtn.addEventListener('click', skipQuestion);
+
+        soundToggleBtn.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            soundIcon.textContent = soundEnabled ? '🔊' : '🔇';
+            soundToggleBtn.querySelector('span:last-child').textContent = soundEnabled ? 'Ses Açık' : 'Ses Kapalı';
+            if (soundEnabled) playSound('click');
+        });
+
+        // Özel Onay Modalı Yönetimi
+        const confirmModal = document.getElementById('confirm-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDesc = document.getElementById('modal-desc');
+        const modalCancelBtn = document.getElementById('modal-cancel-btn');
+        const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+        let onConfirmCallback = null;
+
+        function openConfirmModal(title, desc, callback) {
+            modalTitle.textContent = title;
+            modalDesc.textContent = desc;
+            onConfirmCallback = callback;
+            confirmModal.classList.remove('hidden');
+            confirmModal.classList.add('flex');
+        }
+
+        function closeConfirmModal() {
+            confirmModal.classList.add('hidden');
+            confirmModal.classList.remove('flex');
+            onConfirmCallback = null;
+        }
+
+        modalCancelBtn.addEventListener('click', closeConfirmModal);
+        modalConfirmBtn.addEventListener('click', () => {
+            if (onConfirmCallback) onConfirmCallback();
+            closeConfirmModal();
+        });
+
+        quitGameBtn.addEventListener('click', () => {
+            openConfirmModal(
+                'Oyundan Çıkılsın mı?',
+                'Mevcut ilerlemeniz kaydedilmeyecek ve ana menüye döneceksiniz.',
+                () => {
+                    clearInterval(state.timerInterval);
+                    gameScreen.classList.add('hidden');
+                    menuScreen.classList.remove('hidden');
+                    renderLeaderboard();
+                }
+            );
+        });
+
+        clearScoresBtn.addEventListener('click', () => {
+            openConfirmModal(
+                'Liderlik Tablosu Sıfırlansın mı?',
+                'Kayıtlı tüm yüksek skorlar kalıcı olarak silinecektir.',
+                () => {
+                    localStorage.removeItem(STORAGE_KEY);
+                    renderLeaderboard();
+                }
+            );
+        });
+
+        document.getElementById('play-again-btn').addEventListener('click', startGame);
+
+        document.getElementById('back-to-menu-btn').addEventListener('click', () => {
+            resultScreen.classList.add('hidden');
+            menuScreen.classList.remove('hidden');
+            renderLeaderboard();
+        });
+    </script>
+</body>
+</html>
